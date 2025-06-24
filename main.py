@@ -52,7 +52,7 @@ def get_match_score(target_word, sentence):
     return abs(score)
 
 
-def find_words(sentence, target_words, following, no_word):
+def find_words(sentence, target_words, following, no_word, context):
     traceback = []
     meaning = []
     for i in range(len(sentence)):
@@ -80,7 +80,10 @@ def find_words(sentence, target_words, following, no_word):
                             check += 1
                     meaning.extend(sentence_meaning)
                     if check == 3:
-                        follow = " ".join(sentence[i:i + (following + len(target_words))])
+                        if context:
+                            follow = " ".join(sentence[max(0,i-5):i + (following + len(target_words))])
+                        else:
+                            follow = " ".join(sentence[i:i + (following + len(target_words))])
                         traceback.append((follow, i, get_match_score(" ".join(target_words), sentence)))
 
     return traceback
@@ -91,12 +94,11 @@ text = (
 )
 
 
-
 target = ("sapeva che")
 words = text.split()
 targets = target.split()
 
-index = find_words(words, targets, 16, "non")
+index = find_words(words, targets, 16, "non", False) #Added the context line in update. False for no context True for five word context.
 
 if index:
     for i in range(len(index)):
